@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  
+  <title>Techboy Bagwell | Full Stack Developer</title>
+  <!-- Google Fonts + Font Awesome Icons -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0c12;
+      color: #eef2ff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ---- live canvas background (particle network) ---- */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 30%, #0b1120, #03060c);
+    }
+
+    /* main container relative to canvas */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    /* glassmorphic card style */
+    .glass-card {
+      background: rgba(15, 25, 35, 0.55);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      border: 1px solid rgba(72, 187, 255, 0.2);
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s ease, border-color 0.2s;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 200, 255, 0.5);
+    }
+
+    /* navigation */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      background: rgba(10, 18, 28, 0.7);
+      backdrop-filter: blur(12px);
+      padding: 0.9rem 2rem;
+      border-radius: 80px;
+      border: 1px solid rgba(72, 187, 255, 0.2);
+      position: relative;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, #fff, #4facfe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    /* Hamburger menu button - hidden on desktop */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #4facfe;
+      font-size: 1.8rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      transition: 0.3s;
+      z-index: 100;
+    }
+
+    .hamburger:hover {
+      color: #8ac4fe;
+      transform: scale(1.05);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #cfddee;
+      font-weight: 500;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+
+    .nav-links a:hover {
+      color: #4facfe;
+      text-shadow: 0 0 6px rgba(79, 172, 254, 0.5);
+    }
+
+    /* hero section */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 5rem;
+    }
+
+    .hero-left h1 {
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      background: linear-gradient(to right, #ffffff, #b3e0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-left .highlight {
+      color: #4facfe;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      display: inline-block;
+    }
+
+    .hero-tag {
+      font-size: 1.2rem;
+      margin: 1rem 0 0.8rem;
+      color: #b9d0f0;
+    }
+
+    .hero-desc {
+      max-width: 550px;
+      margin: 1.2rem 0 2rem;
+      line-height: 1.5;
+      color: #cbd5e6;
+    }
+
+    .tech-stack-badge {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin: 1.5rem 0;
+    }
+
+    .tech-stack-badge span {
+      background: rgba(79, 172, 254, 0.15);
+      backdrop-filter: blur(4px);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(95deg, #2b6ef0, #3b82f6);
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(95deg, #1e5ad9, #2b6ef0);
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-outline {
+      border: 1px solid #4facfe;
+      background: transparent;
+      color: #e0f0ff;
+    }
+
+    .btn-outline:hover {
+      background: rgba(79, 172, 254, 0.1);
+      border-color: #8ac4fe;
+    }
+
+    /* stats row */
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      margin: 3rem 0 4rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      flex: 1;
+      min-width: 130px;
+      background: rgba(10, 20, 32, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 1.3rem 1rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(72, 187, 255, 0.25);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #4facfe;
+    }
+
+    /* section titles */
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: -0.5px;
+      border-left: 5px solid #3b82f6;
+      padding-left: 1.2rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .project-card {
+      background: rgba(12, 22, 32, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      transition: all 0.25s;
+      border: 1px solid rgba(79, 172, 254, 0.2);
+    }
+
+    .project-card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-card p {
+      color: #b9cef0;
+      line-height: 1.4;
+      margin: 0.5rem 0 1rem;
+    }
+
+    /* contact + connect section */
+    .contact-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .contact-form, .connect-links {
+      flex: 1;
+      background: rgba(10, 20, 32, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      padding: 2rem;
+      border: 1px solid rgba(79, 172, 254, 0.25);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      background: rgba(20, 30, 45, 0.8);
+      border: 1px solid #2d4059;
+      border-radius: 1.2rem;
+      color: white;
+      font-family: inherit;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 5px rgba(59,130,246,0.5);
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .social-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.05);
+      padding: 0.7rem 1.2rem;
+      border-radius: 60px;
+      transition: 0.2s;
+      text-decoration: none;
+      color: #e2edff;
+    }
+
+    .social-item i {
+      width: 28px;
+      font-size: 1.4rem;
+      color: #4facfe;
+    }
+
+    .social-item:hover {
+      background: rgba(79, 172, 254, 0.2);
+      transform: translateX(6px);
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      text-align: center;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      border-top: 1px solid rgba(79,172,254,0.2);
+      padding-top: 2rem;
+    }
+
+    .activate-warning {
+      background: rgba(0,0,0,0.4);
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
+    }
+
+    .magana {
+      background: rgba(12, 22, 32, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      width: 315px;
+      transition: all 0.25s;
+      border: 1px solid rgba(79, 172, 254, 0.2);
+    }
+
+    /* ===== RESPONSIVE NAVBAR FOR SCREENS 800px AND BELOW ===== */
+    @media (max-width: 800px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .hero-left h1 {
+        font-size: 2.4rem;
+      }
+      
+      /* Navbar becomes relative for absolute positioning of dropdown */
+      .navbar {
+        position: relative;
+        border-radius: 2rem;
+        padding: 0.9rem 1.5rem;
+      }
+      
+      /* Show hamburger button */
+      .hamburger {
+        display: block;
+      }
+      
+      /* Hide nav links by default on mobile */
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: rgba(10, 18, 28, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 1.5rem;
+        margin-top: 0.5rem;
+        padding: 1rem;
+        gap: 0;
+        border: 1px solid rgba(79, 172, 254, 0.3);
+        z-index: 99;
+      }
+      
+      /* Show nav links when active class is added */
+      .nav-links.active {
+        display: flex;
+      }
+      
+      .nav-links li {
+        width: 100%;
+        text-align: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid rgba(79, 172, 254, 0.1);
+      }
+      
+      .nav-links li:last-child {
+        border-bottom: none;
+      }
+      
+      .nav-links a {
+        display: block;
+        font-size: 1.1rem;
+        padding: 0.5rem;
+      }
+      
+      .nav-links a:hover {
+        background: rgba(79, 172, 254, 0.1);
+        border-radius: 0.8rem;
+      }
+    }
+
+    @media (max-width: 511px) {
+      .magana {
+        height: 350px;
+        width: 270px;
+      }
+      .magana img {
+        width: 220px;
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 398px) {
+      .magana {
+        height: 300px;
+        width: 232px;
+      }
+      .magana img {
+        width: 183px;
+        height: 250px;
+      }
+      .logo {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+    }
+
+    .form-notification {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 10000;
+    min-width: 300px;
+    backdrop-filter: blur(12px);
+    border-radius: 1.2rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    animation: slideInRight 0.3s ease forwards;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    border-left: 5px solid;
+}
+
+.form-notification.error {
+    background: rgba(220, 53, 69, 0.95);
+    border-left-color: #ff6b6b;
+    color: white;
+}
+
+.form-notification.success {
+    background: rgba(40, 167, 69, 0.95);
+    border-left-color: #8bc34a;
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.form-notification.hide {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.fa-spinner.fa-pulse {
+    animation: fa-spin 1s infinite steps(8);
+}
+
+
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+  <!-- Navigation with Hamburger Menu -->
+  <nav class="navbar">
+    <div class="logo">Techboy Bagwell</div>
+    <!-- Hamburger button (visible on mobile) -->
+    <button class="hamburger" id="hamburgerBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero section (home) -->
+  <section id="home">
+    <div class="hero">
+      <div class="hero-left">
+        <h1> Ojobo Solomon <br><span class="highlight">Full Stack Developer</span></h1>
+        <div class="hero-tag">Computer Science & Engg. Student &nbsp;| Ready to Innovate</div>
+        <p class="hero-desc">Enhancing digital experiences that are smooth, scalable, and made to impress.</p>
+        <div class="tech-stack-badge">
+          <span>PHP</span>
+          <span>Laravel</span>
+          <span>Javascript</span>
+          <span>MySQL</span>
+        </div>
+        <div class="btn-group">
+          <!-- <a href="#" id="downloadCvBtn" class="btn btn-primary"><i class="fas fa-download"></i> Download CV</a> -->
+          <a href="#" id="copyEmailBtn" class="btn btn-primary"><i class="fas fa-envelope"></i> Copy Email</a>
+          <a href="#portfolio" class="btn btn-outline"><i class="fas fa-eye"></i> View Projects</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="glass-card" style="padding: 1.5rem; text-align: center;">
+          <i class="fas fa-code" style="font-size: 3rem; color:#4facfe;"></i>
+          <p style="margin-top: 10px;">Full Stack <br> Developer</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- stats row -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-number">5+</div>
+      <div>TOTAL PROJECTS</div>
+      <small>Innovative web & mobile solutions crafted</small>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">3</div>
+      <div>CERTIFICATES</div>
+      <small>Professional skills validated</small>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">3+</div>
+      <div>YEARS OF EXPERIENCE</div>
+      <small>Continuous learning journey</small>
+    </div>
+  </div>
+
+  <!-- About section -->
+  <section id="about" style="margin: 2rem 0 4rem;">
+    <div class="glass-card" style="padding: 2rem;">
+      <h2 class="section-title" style="border-left: none; padding-left:0; margin-bottom: 1rem;">About Me</h2>
+      <div class="magana">
+        <a href="IMG_8497.JPG"><img src="IMG_8497.JPG" style="border-radius:8px;" height="350px" alt="profile"></a>
+        <br>
+        <i class="fas fa-camera" style="color:#4facfe;"></i>
+      </div>
+      <br>
+      <p style="text-align: justify; color: #b9cef0; line-height: 1.5; margin: 0.5rem 0 1rem; font-size: 1.1rem; max-width: 100%;">Hello, I'm <strong>Solomon Ojobo</strong> passionate about building smart and scalable web & mobile applications. I've completed a full-stack development course and constantly explore new technologies to refine my skills. Focused on continuous learning, I aim to transition into the IT industry by 2027 and eventually move towards AI and data science.</p>
+      <div style="margin-top: 1.5rem;">
+        <!-- <a href="#" class="btn btn-outline" style="margin-right: 1rem; margin-bottom: 1rem;"><i class="fas fa-file-alt"></i> Download CV</a> -->
+         <a href="#" id="aboutCopyEmailBtn" class="btn btn-outline" style="margin-right: 1rem; margin-bottom: 1rem;"><i class="fas fa-envelope"></i> Copy Email</a>
+        <a href="#portfolio" class="btn btn-primary"><i class="fas fa-arrow-right"></i> View Projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio section -->
+  <section id="portfolio">
+    <h2 class="section-title">Projects Showcase</h2>
+    <div class="projects-grid">
+      <a href="../GlockShop/index.html" style="text-decoration:none; color:white;">
+        <div class="project-card">
+          <h3>GlockShop Website</h3>
+          <p>Real-time mock interviews with AI, no forms or clicks — just natural, personalized conversation to ace your career.</p>
+          <i class="fas fa-robot" style="color:#4facfe;"></i>
+        </div>
+      </a>
+      <a href="../Bootstrap 5/index.html" style="text-decoration:none; color:white;">
+        <div class="project-card">
+          <h3>Bootstrap5 Website</h3>
+          <p>A social app where you can connect in real-time, log in with one click, share moments, and chat seamlessly.</p>
+          <i class="fas fa-users" style="color:#4facfe;"></i>
+        </div>
+      </a>
+      <a href="../Landing Pg/index.html" style="text-decoration:none; color:white;">
+        <div class="project-card">
+          <h3>LandingPg Website</h3>
+          <p>A video streaming app made for fast-paced work. Offers a variety of features for personal entertainment and everything you love.</p>
+          <i class="fas fa-video" style="color:#4facfe;"></i>
+        </div>
+      </a>
+      <a href="../PeriodicTable/index.html" style="text-decoration:none; color:white;">
+        <div class="project-card">
+          <h3>Periodic Table</h3>
+          <p>Developer tool aggregator with real-time API integration, showcasing modern MERN stack implementation.</p>
+          <i class="fas fa-layer-group" style="color:#4facfe;"></i>
+        </div>
+      </a>
+    </div>
+    <div style="text-align: right;"><a href="#" class="btn btn-outline">See More <i class="fas fa-arrow-right"></i></a></div>
+  </section>
+
+  <!-- Contact section -->
+  <!-- Contact section with direct email (mailto + Gmail compose) -->
+  <section id="contact">
+    <div class="contact-section">
+      <div class="contact-form">
+        <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Contact Me</h3>
+        <p>Got a quetion? Send me a message, and I'll get back to you soon.</p>
+        <br>
+        <!-- Using the exact class names from your HTML: .contact-form, .form-group, #directEmailForm etc -->
+        <form id="directEmailForm">
+          <div class="form-group">
+            <input type="text" id="name" name="name" placeholder="Your Name..." required>
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" name="email" placeholder="Your Email... " required>
+          </div>
+          <div class="form-group">
+            <textarea id="message" name="message" rows="4" placeholder="Message..." required></textarea>
+          </div>
+          <button type="submit" id="submitBtn" class="btn btn-primary" style="width:100%;">
+            <i class="fas fa-paper-plane"></i> Send Message 
+          </button>
+        </form>
+        <p style="font-size:0.75rem; margin-top:1rem; text-align:center; opacity:0.7;"><i class="fas fa-lock"></i> Your message will be sent directly via email client.</p>
+      </div>
+      
+      <div class="connect-links">
+        <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Connect With Me</h3>
+        <p>Let's connect and collaborate — follow me on social & coding platforms.</p>
+        <div class="social-links">
+          <a href="https://www.instagram.com/techboy_bagwell" class="social-item" target="_blank"><i class="fab fa-instagram"></i> <span>Insta @Techboy_Bagwell</span></a>
+          <a href="https://www.tiktok.com/@techboy_bagwell?_r=1&_t=ZS-95W7KI07V7A" class="social-item" target="_blank"><i class="fab fa-tiktok"></i> <span>TikTok @Techboy_Bagwell</span></a>
+          <a href="https://github.com/techboy-bagwell" class="social-item" target="_blank"><i class="fab fa-github"></i> <span>GitHub @Techboy-Bagwell</span></a>
+        </div>
+        <div style="margin-top: 2rem; background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 0.8rem;">
+          <i class="fas fa-envelope"></i> techboy.bagwell@gmail.com<br>
+          <i class="fas fa-map-marker-alt"></i> Abuja, Nigeria
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <div class="footer-note">
+    <div class="activate-warning"><i class="fab fa-windows"></i> My Portfolio Website.</div>
+    <p style="margin-top: 1rem;">© 2025 Techboy Bagwell — Full Stack Developer Portfolio</p>
+  </div>
+</div>
+
+<script>
+  // ===== HAMBURGER MENU TOGGLE =====
+  document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const navLinks = document.getElementById('navLinks');
+    const hamburgerIcon = hamburgerBtn.querySelector('i');
+    
+    // Toggle menu when hamburger is clicked
+    hamburgerBtn.addEventListener('click', function() {
+      navLinks.classList.toggle('active');
+      // Change icon between bars and times
+      if (navLinks.classList.contains('active')) {
+        hamburgerIcon.classList.remove('fa-bars');
+        hamburgerIcon.classList.add('fa-times');
+      } else {
+        hamburgerIcon.classList.remove('fa-times');
+        hamburgerIcon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close menu when a nav link is clicked (smooth scroll)
+    const navItems = navLinks.querySelectorAll('a');
+    navItems.forEach(link => {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId !== "#" && targetId.startsWith('#')) {
+          e.preventDefault();
+          // Close the mobile menu
+          navLinks.classList.remove('active');
+          hamburgerIcon.classList.remove('fa-times');
+          hamburgerIcon.classList.add('fa-bars');
+          // Smooth scroll to target
+          const targetElem = document.querySelector(targetId);
+          if (targetElem) {
+            targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+    
+    // Close menu if clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      if (window.innerWidth <= 800) {
+        const isClickInsideNav = navLinks.contains(event.target);
+        const isClickOnHamburger = hamburgerBtn.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnHamburger && navLinks.classList.contains('active')) {
+          navLinks.classList.remove('active');
+          hamburgerIcon.classList.remove('fa-times');
+          hamburgerIcon.classList.add('fa-bars');
+        }
+      }
+    });
+    
+    // Handle window resize - reset menu state if resizing to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 800) {
+        navLinks.classList.remove('active');
+        if (hamburgerIcon) {
+          hamburgerIcon.classList.remove('fa-times');
+          hamburgerIcon.classList.add('fa-bars');
+        }
+      }
+    });
+  });
+
+  
+
+  // ========== LIVE BACKGROUND: PARTICLE NETWORK ==========
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  let particles = [];
+  let mouseX = null, mouseY = null;
+  let hueBase = 200;
+
+  function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    initParticles(180);
+  }
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.radius = Math.random() * 2.5 + 1.2;
+      this.baseColor = `hsl(${hueBase + Math.random() * 30}, 70%, 65%)`;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < -20) this.x = width + 20;
+      if (this.x > width + 20) this.x = -20;
+      if (this.y < -20) this.y = height + 20;
+      if (this.y > height + 20) this.y = -20;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.baseColor;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = "rgba(79, 172, 254, 0.5)";
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function initParticles(count) {
+    particles = [];
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function drawLines() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = 120;
+        if (dist < maxDist) {
+          let opacity = (1 - dist / maxDist) * 0.35;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(100, 180, 255, ${opacity})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+    if (mouseX !== null && mouseY !== null) {
+      for (let p of particles) {
+        const dx = p.x - mouseX;
+        const dy = p.y - mouseY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius + 1.2, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(79, 200, 255, 0.7)`;
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  function animateBackground() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    const grad = ctx.createLinearGradient(0, 0, width*0.8, height);
+    grad.addColorStop(0, '#050a14');
+    grad.addColorStop(1, '#0b1424');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+    
+    for (let p of particles) {
+      p.update();
+      p.draw();
+    }
+    drawLines();
+    requestAnimationFrame(animateBackground);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+  });
+  
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+  
+  window.addEventListener('mouseleave', () => {
+    mouseX = null;
+    mouseY = null;
+  });
+  
+  resizeCanvas();
+  animateBackground();
+
+  // Form submission handler
+//   const form = document.getElementById('messageForm');
+//   if (form) {
+    
+//     form.addEventListener('submit', (e) => {
+    
+//       e.preventDefault();
+//       alert('✨ Thank you! Your message has been sent. (Demo portfolio)');
+//       form.reset(); 
+//     }); 
+//   }
+
+// ========== REPLACED CV DOWNLOAD WITH COPY EMAIL FUNCTIONALITY ==========
+  // Target email: techboybagwell@gmail.com
+  const TARGET_EMAIL = 'techboybagwell@gmail.com';
+  
+  // Helper to show notification
+  function showCopyNotification(message, type) {
+    const existingNotif = document.querySelector('.form-notification');
+    if (existingNotif) existingNotif.remove();
+    
+    const notif = document.createElement('div');
+    notif.className = `form-notification ${type}`;
+    const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+    notif.innerHTML = `${icon} <span>${message}</span>`;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+      notif.classList.add('hide');
+      setTimeout(() => { if(notif.parentNode) notif.remove(); }, 500);
+    }, 3000);
+  }
+  
+  // Core copy email function using modern clipboard API
+  async function copyEmailToClipboard(event, buttonElement) {
+    if (event) event.preventDefault();
+    try {
+      await navigator.clipboard.writeText(TARGET_EMAIL);
+      // Show success toast
+      showCopyNotification(` Copied!`, 'success');
+      // Optional: add a tiny visual feedback on button
+      const originalHTML = buttonElement.innerHTML;
+      buttonElement.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        buttonElement.innerHTML = originalHTML;
+      }, 2000);
+    } catch (err) {
+      console.error('Clipboard failed: ', err);
+      // Fallback for older browsers: use textarea method
+      const textarea = document.createElement('textarea');
+      textarea.value = TARGET_EMAIL;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showCopyNotification(`✅ Copied! (Fallback method)`, 'success');
+      const originalHTML = buttonElement.innerHTML;
+      buttonElement.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        buttonElement.innerHTML = originalHTML;
+      }, 2000);
+    }
+  }
+  
+  // Initialize copy buttons once DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Main hero copy email button
+    const copyEmailMainBtn = document.getElementById('copyEmailBtn');
+    if (copyEmailMainBtn) {
+      copyEmailMainBtn.addEventListener('click', (e) => copyEmailToClipboard(e, copyEmailMainBtn));
+    }
+    
+    // About section copy email button
+    const copyEmailAboutBtn = document.getElementById('aboutCopyEmailBtn');
+    if (copyEmailAboutBtn) {
+      copyEmailAboutBtn.addEventListener('click', (e) => copyEmailToClipboard(e, copyEmailAboutBtn));
+    }
+    
+    // Remove any old CV download listeners, they are replaced; the old downloadImages function no longer needed.
+    // Ensure any stray download references are gone.
+  });
+
+
+// ========== 4. ENHANCED DIRECT EMAIL FORM (Using your exact form class/IDs) ==========
+  // ========== 4. ENHANCED DIRECT EMAIL FORM (Using your exact form class/IDs) ==========
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('directEmailForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const messageInput = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Helper to show custom toast notification (replaces missing alert-success)
+    function showNotification(message, type) {
+      // Remove any existing notification
+      const existingNotif = document.querySelector('.form-notification');
+      if (existingNotif) existingNotif.remove();
+      
+      const notif = document.createElement('div');
+      notif.className = `form-notification ${type}`;
+      const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+      notif.innerHTML = `${icon} <span>${message}</span>`;
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.classList.add('hide');
+        setTimeout(() => { if(notif.parentNode) notif.remove(); }, 500);
+      }, 4500);
+    }
+    
+    // Function to open Gmail compose with pre-filled fields
+    function openGmailCompose(userName, userEmail, userMessage) {
+      // Recipient email (owner's email)
+      const recipient = 'techboybagwell@gmail.com';
+      // Subject line with professional format
+      const subject = `Portfolio Contact: ${userName} via Techboy Bagwell site`;
+      // Construct Email Body with clear formatting
+      const body = `Hello Techboy Bagwell,%0D%0A%0D%0AYou have received a new message from your portfolio contact form.%0D%0A%0D%0A--- Contact Details ---%0D%0AName: ${userName}%0D%0AEmail: ${userEmail}%0D%0A%0D%0AMessage:%0D%0A${userMessage}%0D%0A%0D%0A-- %0D%0ASent via Techboy Bagwell Portfolio Website`;
+      
+      // Create Gmail compose URL with properly encoded parameters
+      const mailtoUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      
+      return mailtoUrl;
+    }
+    
+    // Handle form submit - onclick submit, send user details, and take user to email
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Trim values
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const message = messageInput.value.trim();
+      
+      // Validation
+      if (!name || !email || !message) {
+        showNotification('❌ Please fill in all fields (Name, Email, Message).', 'error');
+        return;
+      }
+      
+      // Validate email format (simple regex)
+      const emailPattern = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+      if (!emailPattern.test(email)) {
+        showNotification('⚠️ Please enter a valid email address (e.g., name@domain.com).', 'error');
+        return;
+      }
+      
+      // Disable button to avoid double submission during redirect
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Preparing email...';
+      
+      // Generate Gmail compose URL with user details
+      const gmailLink = openGmailCompose(name, email, message);
+      
+      // Show success toast
+      showNotification('✓ Message draft ready! Redirecting to Gmail...', 'success');
+      
+      // Reset form fields
+      form.reset();
+      
+      // Small delay to ensure notification is visible, then redirect to Gmail compose
+      setTimeout(() => {
+        // Open the Gmail compose window in a new tab (better UX)
+        window.open(gmailLink, '_blank');
+        // Re-enable button after redirect trigger
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+        
+        // Optional: additional feedback that it's complete
+        showNotification('✨ Gmail compose opened. Send the email to reach me!', 'success');
+      }, 800);
+    });
+    
+    // Additional smooth scroll for all anchor links with hash (preserving original behavior)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId !== "#" && targetId.startsWith('#')) {
+          const targetElem = document.querySelector(targetId);
+          if (targetElem) {
+            e.preventDefault();
+            targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
